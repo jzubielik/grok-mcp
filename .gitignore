@@ -1,0 +1,14 @@
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+.pdm-python
+dist/
+.pdm-build/
+*.egg-info/
+
+# Local configuration — never committed
+.env
+.env.*
+!.env.example
+.mcp.json
