@@ -12,6 +12,8 @@ import pytest
 # starts from the import-time values and its changes are undone, so test order cannot matter.
 _MODULE_GLOBALS = (
     ("grok_mcp.models_registry", "_effort_unsupported"),
+    ("grok_mcp.server", "_started"),
+    ("grok_mcp.server", "_process_lifespan"),
     ("grok_mcp.auth", "_secrets"),
     ("grok_mcp.config", "settings"),  # test_config reload()s the module
 )
