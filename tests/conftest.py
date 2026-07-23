@@ -15,6 +15,7 @@ _MODULE_GLOBALS = (
     ("grok_mcp.server", "_started"),
     ("grok_mcp.server", "_process_lifespan"),
     ("grok_mcp.auth", "_secrets"),
+    ("grok_mcp.tools.models", "_templates"),
     ("grok_mcp.config", "settings"),  # test_config reload()s the module
 )
 _pristine: list[tuple[object, str, object, object]] = []
