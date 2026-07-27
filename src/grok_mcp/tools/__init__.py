@@ -2,6 +2,7 @@
 
 from . import (  # noqa: F401
     audio,
+    files,
     images,
     info,
     models,
