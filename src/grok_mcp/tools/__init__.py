@@ -7,4 +7,5 @@ from . import (  # noqa: F401
     info,
     models,
     search,
+    shell,
 )
