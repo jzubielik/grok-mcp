@@ -14,6 +14,9 @@ _MODULE_GLOBALS = (
     ("grok_mcp.models_registry", "_effort_unsupported"),
     ("grok_mcp.server", "_started"),
     ("grok_mcp.server", "_process_lifespan"),
+    ("grok_mcp.tools.jobs", "_TASKS"),
+    ("grok_mcp.tools.jobs", "_RUNNING"),
+    ("grok_mcp.tools.jobs", "_heartbeat_task"),
     ("grok_mcp.auth", "_secrets"),
     ("grok_mcp.tools.models", "_templates"),
     ("grok_mcp.config", "settings"),  # test_config reload()s the module

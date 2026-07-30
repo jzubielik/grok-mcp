@@ -5,6 +5,7 @@ from . import (  # noqa: F401
     files,
     images,
     info,
+    jobs,
     models,
     search,
     shell,
