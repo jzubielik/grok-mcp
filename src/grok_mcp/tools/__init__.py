@@ -2,6 +2,7 @@
 
 from . import (  # noqa: F401
     audio,
+    chat,
     context_cache,
     files,
     images,
