@@ -17,6 +17,7 @@ _MODULE_GLOBALS = (
     ("grok_mcp.tools.jobs", "_TASKS"),
     ("grok_mcp.tools.jobs", "_RUNNING"),
     ("grok_mcp.tools.jobs", "_heartbeat_task"),
+    ("grok_mcp.retention", "_task"),
     ("grok_mcp.tools.context_cache", "_BOOTSTRAP_PROJECT_PATH"),
     ("grok_mcp.auth", "_secrets"),
     ("grok_mcp.tools.models", "_templates"),
