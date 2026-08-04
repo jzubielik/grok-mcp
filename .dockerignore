@@ -1,0 +1,6 @@
+# Build context: only what the Dockerfile copies (pyproject.toml, pdm.lock, src/)
+*
+!pyproject.toml
+!pdm.lock
+!src/
+**/__pycache__

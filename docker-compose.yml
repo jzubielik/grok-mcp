@@ -1,0 +1,94 @@
+# Configuration lives in ONE file outside the directories the agent can reach:
+#   ~/.config/grok-mcp/.env   (copy .env.example there, chmod 600)
+# Start with `make up` — it points Compose at that file (GROK_CONFIG=... for another one).
+services:
+  postgres:
+    # bookworm matches the glibc of the former pgvector/pgvector:pg17 image, so existing data
+    # volumes keep their collation version. Pinned by digest like the app image; bump it deliberately.
+    image: postgres:17-bookworm@sha256:3645570cccdfa447589da9f57dd740faa29b30938e861289a5574b6ca6b03826
+    restart: always
+    environment:
+      POSTGRES_DB: context_cache
+      POSTGRES_USER: ${POSTGRES_USER:-grok}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+    # Published on loopback only, for local DB tools; remove to keep the DB internal.
+    ports:
+      - "${POSTGRES_BIND:-127.0.0.1}:${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d context_cache"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  grok-mcp:
+    build:
+      context: .
+      args:
+        UID: ${DOCKER_UID:-1000}
+        GID: ${DOCKER_GID:-1000}
+    restart: unless-stopped
+    # tini as PID 1 reaps orphans the agent's shell leaves behind (`cmd &`, setsid, git gc --auto).
+    # Docker gives PID 1 the whole environment, secrets included, so tini must not share the
+    # agent's uid: the container starts as root (tini stays root) and the server drops to
+    # GROK_RUN_UID before any tool runs. Do not "fix" either half alone — without init the
+    # orphans pile up, with init under the runtime uid /proc/1/environ hands out every secret.
+    init: true
+    user: "0:0"
+    cap_drop: [ALL]
+    cap_add: [SETUID, SETGID]   # only for that one drop; a non-root uid keeps no capabilities
+    depends_on:
+      postgres:
+        condition: service_healthy
+    # The configuration (with the secrets) lives OUTSIDE the mounted directories — by default
+    # ~/.config/grok-mcp/.env; `make up` passes it here. The server refuses to start if it sits
+    # under WORKSPACE_DIR / ASSETS_DIR, where the agent's shell could read it.
+    env_file:
+      - path: ${GROK_ENV_FILE:?start with `make up` (or set GROK_ENV_FILE and COMPOSE_ENV_FILES)}
+        required: true
+    # Only values fixed by this deployment; everything tunable comes from the config file.
+    environment:
+      GROK_CONFIG_FILE: ${GROK_ENV_FILE}
+      # The password travels separately (asyncpg merges PGPASSWORD with the DSN), so it needs
+      # no URL escaping.
+      DATABASE_URL: postgresql://${POSTGRES_USER:-grok}@postgres:5432/context_cache
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+      MCP_TRANSPORT: http
+      # Inside the container; the server refuses this bind without MCP_AUTH_TOKEN.
+      MCP_HTTP_HOST: 0.0.0.0
+      MCP_HTTP_PORT: "8000"
+      # Private home for git and other tools: a tmpfs only the server's uid can enter.
+      HOME: /tmp/grok-mcp
+      GROK_RUN_UID: ${DOCKER_UID:-1000}
+      GROK_RUN_GID: ${DOCKER_GID:-1000}
+      GROK_WRITE_ALLOWED_PATHS: ${GROK_WRITE_ALLOWED_PATHS:-${WORKSPACE_DIR},${ASSETS_DIR:-/srv/grok-assets}}
+      GROK_READ_ALLOWED_PATHS: ${GROK_READ_ALLOWED_PATHS:-${WORKSPACE_DIR},${ASSETS_DIR:-/srv/grok-assets}}
+    tmpfs:
+      - /tmp/grok-mcp:size=1g,mode=0700,uid=${DOCKER_UID:-1000},gid=${DOCKER_GID:-1000}
+      - /tmp:size=1g,mode=1777   # shell output and temp files: bounded, off the host disk
+    ports:
+      - "${MCP_BIND:-127.0.0.1}:${MCP_PORT:-8000}:8000"
+    # Bounds for whatever the agent's shell runs (a runaway build, a fork bomb).
+    mem_limit: ${GROK_MEM_LIMIT:-4g}
+    pids_limit: ${GROK_PIDS_LIMIT:-512}
+    security_opt:
+      - no-new-privileges:true
+    # Logs are JSON Lines on stderr. Rotation here bounds disk use only; time-based retention
+    # belongs to your log pipeline (journald, Loki, ...).
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "5"
+    # Mount the workspace at the SAME path so host file paths resolve 1:1. The server runs as
+    # the host user (GROK_RUN_UID), so files created via tools belong to you.
+    volumes:
+      - ${WORKSPACE_DIR:?set WORKSPACE_DIR in ~/.config/grok-mcp/.env, e.g. /home/you/projects}:${WORKSPACE_DIR}
+      # A second host directory, also at the SAME path, for files outside the workspace
+      # (e.g. screenshots another tool writes). Optional: unset uses a private Docker volume.
+      - ${ASSETS_DIR:-grok-assets}:${ASSETS_DIR:-/srv/grok-assets}
+
+volumes:
+  pgdata:
+  grok-assets:
