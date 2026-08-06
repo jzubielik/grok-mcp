@@ -1,0 +1,35 @@
+name: Release
+
+permissions:
+  contents: write
+
+on:
+  push:
+    tags: ["v*.*.*"]
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          fetch-depth: 0
+
+      - name: Generate release notes
+        run: |
+          VERSION="${GITHUB_REF#refs/tags/}"
+          PREV_TAG=$(git tag --sort=-creatordate \
+                       | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' \
+                       | grep -v "^${VERSION}$" \
+                       | head -1 || true)
+          RANGE="${PREV_TAG:+${PREV_TAG}..HEAD}"
+          RANGE="${RANGE:-HEAD}"
+          printf '## Changes\n\n' > /tmp/release_notes.md
+          git log ${RANGE} --pretty="format:- %s (%h)" --no-merges >> /tmp/release_notes.md
+
+      - name: Create release
+        uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2.6.2
+        with:
+          body_path: /tmp/release_notes.md
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
