@@ -57,6 +57,26 @@ a confidentiality boundary: a command can read anything in the container, mounts
 `WORKSPACE_DIR` and `ASSETS_DIR` must be real paths — `make up` refuses symlinks. Ports are
 published on `127.0.0.1` only. See `.env.example` for every variable.
 
+**Prebuilt image.** `make up` builds the image locally so it matches your `DOCKER_UID`. A
+prebuilt one is published to the GitHub Container Registry:
+
+```bash
+docker pull ghcr.io/jzubielik/grok-mcp:latest
+```
+
+| Tag | Points at |
+|-----|-----------|
+| `latest` | the newest release |
+| `vX.Y.Z` | a specific release, e.g. `v1.0.0` |
+| `edge` | the current `master` |
+| `sha-<commit>` | a specific `master` commit |
+
+It is built for UID/GID 1000. The server still drops to `GROK_RUN_UID`, so it runs under any
+uid, but the default `grok-assets` volume is created owned by 1000 — with another uid, set
+`ASSETS_DIR` to a directory of your own. To run it with the compose stack, replace the
+`build:` block of the `grok-mcp` service with `image: ghcr.io/jzubielik/grok-mcp:v1.0.0` and
+start with `make up`.
+
 **Option B: stdio** — each MCP client session starts its own server process. Point them all
 at the same PostgreSQL (e.g. the compose `postgres` service, published on `127.0.0.1:5432`):
 every session then shares conversation history and background jobs, and `list_jobs`/`get_job` see
