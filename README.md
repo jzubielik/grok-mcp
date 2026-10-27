@@ -1,6 +1,8 @@
 # Grok MCP
 
-An MCP server for the xAI Grok API, providing text chat, deep reasoning, vision analysis, and image generation as MCP tools usable from any MCP client.
+An MCP server for the xAI Grok API, usable from any MCP client: chat and reasoning with an
+optional agent loop over your workspace (read, write, shell, web fetch and search), vision,
+image generation, text-to-speech and transcription.
 
 > Independent project — not affiliated with or endorsed by xAI. "Grok" is a trademark of xAI.
 

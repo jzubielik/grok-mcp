@@ -1,7 +1,7 @@
 [project]
 name = "grok-mcp"
 version = "1.0.1"
-description = "MCP server for the xAI Grok API — image generation, vision, chat, reasoning"
+description = "MCP server for the xAI Grok API — chat and agent loop, vision, image generation, text-to-speech, transcription"
 readme = "README.md"
 requires-python = ">=3.11"
 license = {text = "MIT"}
