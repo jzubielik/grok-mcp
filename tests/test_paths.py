@@ -247,7 +247,7 @@ def test_write_never_unlinks_a_file_it_did_not_create(monkeypatch, tmp_path):
     assert not (outside / "new.txt").exists()  # created by this call → removed again
 
 
-def test_write_creates_files_without_access_for_others(monkeypatch, tmp_path):
+def test_write_creates_files_for_the_owner_only(monkeypatch, tmp_path):
     import os
     import stat
 
@@ -263,7 +263,7 @@ def test_write_creates_files_without_access_for_others(monkeypatch, tmp_path):
         write_bytes_nofollow(existing, b"new")
     finally:
         os.umask(old_umask)
-    assert stat.S_IMODE((tmp_path / "new.png").stat().st_mode) == 0o640
+    assert stat.S_IMODE((tmp_path / "new.png").stat().st_mode) == 0o600
     assert stat.S_IMODE(existing.stat().st_mode) == 0o604  # an overwrite keeps the mode
     assert existing.read_bytes() == b"new"
 
