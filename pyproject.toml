@@ -55,4 +55,5 @@ ignore = ["E501", "B008"]
 [dependency-groups]
 dev = [
     "ruff>=0.16.6",
+    "pre-commit>=4.7.0",
 ]

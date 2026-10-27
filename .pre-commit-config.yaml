@@ -1,0 +1,47 @@
+# Install once per clone: `make hooks`. CI runs the same hooks on every file.
+# Scanners run as container images pinned by digest — the same ones CI uses — so a hook needs
+# Docker but no local Go or Rust toolchain. Bump tag and digest together.
+repos:
+  - repo: local
+    hooks:
+      - id: gitleaks
+        name: gitleaks (staged changes)
+        language: docker_image
+        entry: >-
+          ghcr.io/gitleaks/gitleaks:v8.30.1@sha256:c00b6bd0aeb3071cbcb79009cb16a60dd9e0a7c60e2be9ab65d25e6bc8abbb7f
+          git --pre-commit --staged --redact --no-banner /src
+        pass_filenames: false
+
+      - id: trufflehog
+        name: trufflehog (staged files)
+        language: docker_image
+        entry: >-
+          trufflesecurity/trufflehog:3.99.7@sha256:0d003fc3abc4e1565eca8462b992001314de51451e96e3c44de80d116794d5d1
+          filesystem --results=verified,unknown --fail --no-update
+
+      - id: ruff-check
+        name: ruff check
+        language: system
+        entry: pdm run ruff check
+        types: [python]
+
+      - id: ruff-format
+        name: ruff format
+        language: system
+        entry: pdm run ruff format --check
+        types: [python]
+
+      - id: actionlint
+        name: actionlint
+        language: docker_image
+        entry: >-
+          rhysd/actionlint:1.7.12@sha256:b1934ee5f1c509618f2508e6eb47ee0d3520686341fec936f3b79331f9315667
+        files: ^\.github/workflows/
+
+      - id: zizmor
+        name: zizmor
+        language: docker_image
+        entry: >-
+          ghcr.io/zizmorcore/zizmor:1.31.1@sha256:42d409dbb851d4c5d35a058cf042b828bea1e3f2884378c526eb0974780e18d9
+          --offline
+        files: ^\.github/workflows/

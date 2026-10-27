@@ -17,11 +17,11 @@
 # Long-running with the agent's shell: see README "Container" — an init as PID 1, started as
 # root with GROK_RUN_UID/GROK_RUN_GID, so the init holding the secrets is not the agent's uid.
 
-FROM python:3.12-slim@sha256:a6e34c598f2467ed0e9a8d349809fcd8b5c603269512df273a0bb1784edc11b1 AS builder
+FROM python:3.12-slim@sha256:12316debbfb86890f6b2d825820612741ba527ad5a44e3902759141d572bfe8f AS builder
 
 WORKDIR /app
 
-RUN pip install --no-cache-dir pdm==2.29.0
+RUN pip install --no-cache-dir "pdm[locked]==2.29.0"
 
 COPY pyproject.toml pdm.lock ./
 RUN touch README.md
@@ -29,7 +29,7 @@ COPY src/ src/
 
 RUN pdm install --prod --no-editable
 
-FROM python:3.12-slim@sha256:a6e34c598f2467ed0e9a8d349809fcd8b5c603269512df273a0bb1784edc11b1
+FROM python:3.12-slim@sha256:12316debbfb86890f6b2d825820612741ba527ad5a44e3902759141d572bfe8f
 
 # git for project change detection (git_utils); the rest is a small toolbox for the agent's
 # `shell`. Compilers, Node and the like are left out — build FROM this image to add them.

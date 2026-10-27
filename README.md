@@ -501,6 +501,18 @@ Report vulnerabilities as described in [SECURITY.md](SECURITY.md).
 
 ## Development
 
+Install the git hooks once per clone (needs Docker — the secret scanners and workflow linters run
+as pinned container images):
+
+```bash
+pdm install -G dev
+make hooks
+```
+
+Every commit then runs gitleaks and trufflehog on the staged changes, ruff, and actionlint and
+zizmor on the workflows. CI runs the same hooks on every file, so a commit that skipped them still
+fails the PR.
+
 Run tests:
 
 ```bash
