@@ -7,6 +7,9 @@ on:
   push:
     branches: ["master"]
   pull_request:
+  # New advisories appear without a commit: re-run the dependency audit and the image scan.
+  schedule:
+    - cron: "17 6 * * 1"
 
 env:
   # Pinned by digest; bump tag and digest together (.pre-commit-config.yaml pins the same ones).
@@ -34,8 +37,9 @@ jobs:
       - name: Test
         run: pdm run pytest
 
-  # The same hooks a commit runs locally (ruff, actionlint, zizmor, secret scanners), on every
-  # file — so a commit made without `make hooks` or with --no-verify still fails here.
+  # The same hooks a commit runs locally (ruff, pip-audit, hadolint, actionlint, zizmor, secret
+  # scanners), on every file — so a commit made without `make hooks` or with --no-verify still
+  # fails here.
   hooks:
     runs-on: ubuntu-latest
     steps:

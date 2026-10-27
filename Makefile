@@ -1,4 +1,4 @@
-.PHONY: hooks test lint up down verify-secrets restart logs ps release release-tag deploy-skills deploy-skill
+.PHONY: hooks audit test lint up down verify-secrets restart logs ps release release-tag deploy-skills deploy-skill
 
 # The configuration (secrets included) lives outside WORKSPACE_DIR / ASSETS_DIR, which the
 # agent's shell can read. Override with: make up GROK_CONFIG=/path/to/other.env
@@ -11,6 +11,10 @@ export GROK_ENV_FILE := $(GROK_CONFIG_REAL)
 
 hooks:
 	pdm run pre-commit install
+
+# Known vulnerabilities in the locked runtime dependencies (hashes checked, nothing installed).
+audit:
+	pdm export --prod -f requirements | pdm run pip-audit --strict --disable-pip --require-hashes -r /dev/stdin
 
 test:
 	pdm run pytest

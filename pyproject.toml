@@ -56,4 +56,5 @@ ignore = ["E501", "B008"]
 dev = [
     "ruff>=0.16.6",
     "pre-commit>=4.7.0",
+    "pip-audit>=2.10.1",
 ]
