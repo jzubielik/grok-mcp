@@ -5,7 +5,7 @@ services:
   postgres:
     # bookworm matches the glibc of the former pgvector/pgvector:pg17 image, so existing data
     # volumes keep their collation version. Pinned by digest like the app image; bump it deliberately.
-    image: postgres:17-bookworm@sha256:3645570cccdfa447589da9f57dd740faa29b30938e861289a5574b6ca6b03826
+    image: postgres:17-bookworm@sha256:858bb5e98eed02eb8cafbcdc007f9a65d1b613972028944a8ec2133ccaf80d27
     restart: always
     environment:
       POSTGRES_DB: context_cache
