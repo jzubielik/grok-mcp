@@ -247,6 +247,27 @@ def test_write_never_unlinks_a_file_it_did_not_create(monkeypatch, tmp_path):
     assert not (outside / "new.txt").exists()  # created by this call → removed again
 
 
+def test_write_creates_files_for_the_owner_only(monkeypatch, tmp_path):
+    import os
+    import stat
+
+    from grok_mcp.paths import write_bytes_nofollow
+
+    monkeypatch.setattr(settings, "write_allowed_paths", [str(tmp_path)])
+    old_umask = os.umask(0)  # the mode itself must leave others out, not the umask
+    try:
+        write_bytes_nofollow(tmp_path / "new.png", b"x")
+        existing = tmp_path / "existing.txt"
+        existing.write_text("old")
+        existing.chmod(0o604)
+        write_bytes_nofollow(existing, b"new")
+    finally:
+        os.umask(old_umask)
+    assert stat.S_IMODE((tmp_path / "new.png").stat().st_mode) == 0o600
+    assert stat.S_IMODE(existing.stat().st_mode) == 0o604  # an overwrite keeps the mode
+    assert existing.read_bytes() == b"new"
+
+
 async def test_question_mark_is_a_wildcard(tmp_path):
     from grok_mcp.tools.files import _read_internal
 
