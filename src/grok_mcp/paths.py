@@ -208,10 +208,11 @@ def write_bytes_nofollow(path: str | Path, data: bytes) -> None:
       blocking the server forever.
     - Only a file this call created (O_EXCL) is removed again when the check fails — never one
       that already existed where a swapped path led.
+    - A new file is 0o640: only the server's uid and group read it. An existing file keeps its mode.
     """
     flags = os.O_WRONLY | os.O_NOFOLLOW | os.O_NONBLOCK | os.O_CLOEXEC | os.O_NOCTTY
     try:
-        fd = os.open(path, flags | os.O_CREAT | os.O_EXCL, 0o644)
+        fd = os.open(path, flags | os.O_CREAT | os.O_EXCL, 0o640)
         created = True
     except FileExistsError:
         fd = os.open(path, flags)
