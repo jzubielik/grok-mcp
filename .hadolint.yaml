@@ -1,0 +1,5 @@
+ignored:
+  # Pinning apt package versions breaks the build once Debian drops the old version from its
+  # mirrors and holds back security fixes. The base image is pinned by digest instead, and
+  # Dependabot bumps it; Trivy fails CI on any fixable HIGH/CRITICAL left in the image.
+  - DL3008

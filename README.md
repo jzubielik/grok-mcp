@@ -510,8 +510,8 @@ pdm install -G dev
 make hooks
 ```
 
-Every commit then runs gitleaks and trufflehog on the staged changes, ruff, and actionlint and
-zizmor on the workflows. CI runs the same hooks on every file, so a commit that skipped them still
+Every commit then runs gitleaks and trufflehog on the staged changes, ruff, pip-audit (when
+`pdm.lock` changes), hadolint, and actionlint and zizmor on the workflows. CI runs the same hooks on every file, so a commit that skipped them still
 fails the PR.
 
 Run tests:

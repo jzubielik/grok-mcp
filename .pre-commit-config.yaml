@@ -31,6 +31,21 @@ repos:
         entry: pdm run ruff format --check
         types: [python]
 
+      - id: pip-audit
+        name: pip-audit (locked dependencies)
+        language: system
+        entry: make audit
+        files: ^(pdm\.lock|pyproject\.toml)$
+        pass_filenames: false
+
+      - id: hadolint
+        name: hadolint
+        language: docker_image
+        entry: >-
+          hadolint/hadolint:v2.15.1@sha256:32dac94127fd60b7b7e3fbfc65e1383b9b5e25c9bfd7b8536de7a539fe68a12d
+          hadolint
+        files: (^|/)Dockerfile$
+
       - id: actionlint
         name: actionlint
         language: docker_image
