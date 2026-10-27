@@ -74,7 +74,8 @@ docker pull ghcr.io/jzubielik/grok-mcp:latest
 It is built for UID/GID 1000. The server still drops to `GROK_RUN_UID`, so it runs under any
 uid, but the default `grok-assets` volume is created owned by 1000 — with another uid, set
 `ASSETS_DIR` to a directory of your own. To run it with the compose stack, replace the
-`build:` block of the `grok-mcp` service with `image: ghcr.io/jzubielik/grok-mcp:v1.0.0` and
+`build:` block of the `grok-mcp` service with `image: ghcr.io/jzubielik/grok-mcp:vX.Y.Z` (a
+[release](https://github.com/jzubielik/grok-mcp/releases)) and
 start with `make up`.
 
 **Option B: stdio** — each MCP client session starts its own server process. Point them all
