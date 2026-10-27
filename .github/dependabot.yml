@@ -20,6 +20,11 @@ updates:
       interval: weekly
     commit-message:
       prefix: build
+    ignore:
+      # A new Python line is a deliberate change: the CI test matrix (3.11, 3.12) moves with it.
+      # New digests of 3.12-slim (security fixes) still come through.
+      - dependency-name: python
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
 
   - package-ecosystem: docker-compose
     directory: /
@@ -27,3 +32,8 @@ updates:
       interval: weekly
     commit-message:
       prefix: build
+    ignore:
+      # A new major cannot read the old data directory (and postgres:18 moved PGDATA): upgrading
+      # takes a dump/restore or pg_upgrade, never a tag bump. New 17-bookworm digests still come.
+      - dependency-name: postgres
+        update-types: ["version-update:semver-major"]
