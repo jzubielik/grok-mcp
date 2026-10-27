@@ -71,6 +71,13 @@ docker pull ghcr.io/jzubielik/grok-mcp:latest
 | `edge` | the current `master` |
 | `sha-<commit>` | a specific `master` commit |
 
+Each image is built by the Publish workflow from the tagged commit, with an SBOM and a signed
+build attestation. To check that an image came from this repository's CI:
+
+```bash
+gh attestation verify oci://ghcr.io/jzubielik/grok-mcp:latest -R jzubielik/grok-mcp
+```
+
 It is built for UID/GID 1000. The server still drops to `GROK_RUN_UID`, so it runs under any
 uid, but the default `grok-assets` volume is created owned by 1000 — with another uid, set
 `ASSETS_DIR` to a directory of your own. To run it with the compose stack, replace the
