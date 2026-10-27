@@ -1,4 +1,4 @@
-.PHONY: test lint up down verify-secrets restart logs ps release deploy-skills deploy-skill
+.PHONY: hooks test lint up down verify-secrets restart logs ps release deploy-skills deploy-skill
 
 # The configuration (secrets included) lives outside WORKSPACE_DIR / ASSETS_DIR, which the
 # agent's shell can read. Override with: make up GROK_CONFIG=/path/to/other.env
@@ -8,6 +8,9 @@ GROK_CONFIG ?= $(HOME)/.config/grok-mcp/.env
 GROK_CONFIG_REAL := $(shell realpath -m "$(GROK_CONFIG)")
 export COMPOSE_ENV_FILES := $(GROK_CONFIG_REAL)
 export GROK_ENV_FILE := $(GROK_CONFIG_REAL)
+
+hooks:
+	pdm run pre-commit install
 
 test:
 	pdm run pytest

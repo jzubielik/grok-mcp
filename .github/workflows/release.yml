@@ -14,6 +14,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Generate release notes
         run: |
@@ -25,11 +26,10 @@ jobs:
           RANGE="${PREV_TAG:+${PREV_TAG}..HEAD}"
           RANGE="${RANGE:-HEAD}"
           printf '## Changes\n\n' > /tmp/release_notes.md
-          git log ${RANGE} --pretty="format:- %s (%h)" --no-merges >> /tmp/release_notes.md
+          git log "${RANGE}" --pretty="format:- %s (%h)" --no-merges >> /tmp/release_notes.md
 
+      # The runner ships gh; it authenticates with GH_TOKEN, not with the checkout credentials.
       - name: Create release
-        uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3.0.3
-        with:
-          body_path: /tmp/release_notes.md
+        run: gh release create "${GITHUB_REF_NAME}" --verify-tag --notes-file /tmp/release_notes.md
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
