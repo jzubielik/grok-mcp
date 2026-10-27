@@ -1,4 +1,4 @@
-.PHONY: hooks test lint up down verify-secrets restart logs ps release deploy-skills deploy-skill
+.PHONY: hooks test lint up down verify-secrets restart logs ps release release-tag deploy-skills deploy-skill
 
 # The configuration (secrets included) lives outside WORKSPACE_DIR / ASSETS_DIR, which the
 # agent's shell can read. Override with: make up GROK_CONFIG=/path/to/other.env
@@ -62,6 +62,10 @@ ps:
 release:
 	@test -n "$(VERSION)" || (echo "Usage: make release VERSION=0.2.0" && exit 1)
 	@bash scripts/release.sh $(VERSION)
+
+release-tag:
+	@test -n "$(VERSION)" || (echo "Usage: make release-tag VERSION=0.2.0" && exit 1)
+	@bash scripts/release.sh --tag $(VERSION)
 
 deploy-skills:
 	@SKILLS_DIR="$(SKILLS_DIR)" bash scripts/deploy-skills.sh
