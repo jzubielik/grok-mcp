@@ -37,7 +37,8 @@ services:
     init: true
     user: "0:0"
     cap_drop: [ALL]
-    cap_add: [SETUID, SETGID]   # only for that one drop; a non-root uid keeps no capabilities
+    cap_add: [SETUID, SETGID, KILL]   # uid drop + tini forwarding signals to the dropped server;
+                                      # a non-root uid keeps no capabilities
     depends_on:
       postgres:
         condition: service_healthy
