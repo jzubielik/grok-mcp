@@ -17,7 +17,7 @@
 # Long-running with the agent's shell: see README "Container" — an init as PID 1, started as
 # root with GROK_RUN_UID/GROK_RUN_GID, so the init holding the secrets is not the agent's uid.
 
-FROM python:3.12-slim@sha256:12316debbfb86890f6b2d825820612741ba527ad5a44e3902759141d572bfe8f AS builder
+FROM python:3.12-slim@sha256:5e2bdb1b0d542d5039cffb8181c65930093949194a65c365dfb1b0fe13a4fa5b AS builder
 
 WORKDIR /app
 
@@ -29,7 +29,7 @@ COPY src/ src/
 
 RUN pdm install --prod --no-editable
 
-FROM python:3.12-slim@sha256:12316debbfb86890f6b2d825820612741ba527ad5a44e3902759141d572bfe8f
+FROM python:3.12-slim@sha256:5e2bdb1b0d542d5039cffb8181c65930093949194a65c365dfb1b0fe13a4fa5b
 
 # git for project change detection (git_utils); the rest is a small toolbox for the agent's
 # `shell`. Compilers, Node and the like are left out — build FROM this image to add them.
